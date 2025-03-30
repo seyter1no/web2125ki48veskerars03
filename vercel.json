@@ -1,12 +1,12 @@
 {
   "version": 2,
-  "buildCommand": "npm install", 
+  "buildCommand": "npm install",
   "outputDirectory": ".",
   "public": true,
   "builds": [
     { "src": "server.js", "use": "@vercel/node" },
-    { "src": "index.php", "use": "@vercel/static" },
-    { "src": "another-file.php", "use": "@vercel/static" },
+    { "src": "index.php", "use": "@vercel/php" }, 
+    { "src": "another-file.php", "use": "@vercel/php" },
     { "src": "styles/**/*", "use": "@vercel/static" },
     { "src": "js/**/*", "use": "@vercel/static" }
   ],
