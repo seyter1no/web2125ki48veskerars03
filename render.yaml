@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: my-php-app
+    runtime: ubuntu
+    region: oregon  # або виберіть свою
+    plan: free
+    repo: https://github.com/seyter1no/web2125ki48veskerars03/tree/feature/develop/task2  # замініть на ваш репозиторій
+    buildCommand: |
+      apt update
+      apt install -y php
+    startCommand: php -S 0.0.0.0:10000
