@@ -5,8 +5,8 @@
   "public": true,
   "builds": [
     { "src": "server.js", "use": "@vercel/node" },
-    { "src": "index.php", "use": "@vercel/php" },
-    { "src": "another-file.php", "use": "@vercel/php" },
+    { "src": "index.php", "use": "@vercel/static" },
+    { "src": "another-file.php", "use": "@vercel/static" },
     { "src": "styles/**/*", "use": "@vercel/static" },
     { "src": "js/**/*", "use": "@vercel/static" }
   ],
