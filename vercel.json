@@ -1,9 +1,16 @@
 {
   "version": 2,
+  "buildCommand": "npm install", 
+  "outputDirectory": ".",
+  "public": true,
   "builds": [
-    {
-      "src": "Dockerfile",
-      "use": "@vercel/docker"
-    }
+    { "src": "server.js", "use": "@vercel/node" },
+    { "src": "index.php", "use": "@vercel/php" },
+    { "src": "another-file.php", "use": "@vercel/php" },
+    { "src": "styles/**/*", "use": "@vercel/static" },
+    { "src": "js/**/*", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/$1" }
   ]
 }
