@@ -1,9 +1,7 @@
 services:
   - type: web
-    name: my-php-app
-    env: php
-    branch: main
-    buildCommand: "composer install"
-    startCommand: "php -S 0.0.0.0:$PORT -t public"
-    instances: 1
+    name: your-php-app
+    env: docker
+    buildCommand: "docker build -t your-php-app ."
+    startCommand: "docker run -p 80:80 your-php-app"
     plan: free
