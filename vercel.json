@@ -1,18 +1,16 @@
 {
   "version": 2,
-  "buildCommand": "npm install",
+  "buildCommand": "npm install", 
   "outputDirectory": ".",
   "public": true,
   "builds": [
     { "src": "server.js", "use": "@vercel/node" },
-    { "src": "api/**/*.php", "use": "@vercel/php" }, 
+    { "src": "index.php", "use": "@vercel/php" },
+    { "src": "another-file.php", "use": "@vercel/php" },
     { "src": "styles/**/*", "use": "@vercel/static" },
-    { "src": "js/**/*", "use": "@vercel/static" },
-    { "src": "public/**/*", "use": "@vercel/static" }
+    { "src": "js/**/*", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1.php" },
-    { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/$1" }
   ]
 }
