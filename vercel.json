@@ -5,14 +5,14 @@
   "public": true,
   "builds": [
     { "src": "server.js", "use": "@vercel/node" },
-    { "src": "*.php", "use": "@vercel/static" },
+    { "src": "api/**/*.php", "use": "@vercel/php" }, 
     { "src": "styles/**/*", "use": "@vercel/static" },
     { "src": "js/**/*", "use": "@vercel/static" },
-    { "src": "api/**/*", "use": "@vercel/static" }
+    { "src": "public/**/*", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/server.js" },
+    { "src": "/api/(.*)", "dest": "/api/$1.php" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/$1" }
   ]
-} 
+}
