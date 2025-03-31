@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: your-php-app
-    env: docker
-    buildCommand: "docker build -t your-php-app ."
-    startCommand: "docker run -p 80:80 your-php-app"
-    plan: free
