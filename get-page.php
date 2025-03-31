@@ -2,6 +2,7 @@
 $name = '';
 if ($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET['name'])) {
     $name = htmlspecialchars($_GET['name']);
+    $currentTime = date('Y-m-d H:i:s');
 }
 ?>
 <!DOCTYPE html>
@@ -38,6 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET['name'])) {
                 echo "<div id='get-result'>
                         <h3>GET request received</h3>
                         <p>Hello, $name!</p>
+                        <small>Executed at: $currentTime</small>
                       </div>";
             }
             ?>

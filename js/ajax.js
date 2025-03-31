@@ -1,35 +1,67 @@
 document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("get-form").addEventListener("submit", function(event) {
-        event.preventDefault();
+    function getCurrentTime() {
+        return new Date().toLocaleString(); 
+    }
 
-        const name = document.getElementById('get-name').value;
-        const url = `index.php?name=${encodeURIComponent(name)}`;
+const getForm = document.getElementById("get-form");
+if (getForm) {
+    getForm.addEventListener("submit", function(event) {
+        event.preventDefault(); 
 
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', url, true);
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                document.getElementById('get-result').innerHTML = xhr.responseText;
-            }
-        };
-        xhr.send();
+        const formData = new FormData(this); 
+        const name = formData.get("name"); 
+        const url = `get-page.php?name=${encodeURIComponent(name)}`;
+
+        console.log("Sending GET request with data:", { name }); 
+
+        fetch(url)
+            .then(response => response.text())
+            .then(data => {
+                const currentTime = new Date().toLocaleString(); 
+                console.log("GET response received at:", currentTime);
+
+            
+                document.getElementById("get-result").innerHTML = `
+                    <strong>GET request received</strong><br>
+                    Hello, ${name}!<br>
+                    <small>Executed at: ${currentTime}</small>
+                `;
+            })
+            .catch(error => {
+                console.error("GET request failed:", error);
+                alert("Error: " + error.message);
+            });
     });
+}
 
-    document.getElementById("post-form").addEventListener("submit", function(event) {
-        event.preventDefault();
 
-        const formData = new FormData(this);
+    // ------------------- POST-запит -------------------
+    const postForm = document.getElementById("post-form");
+    if (postForm) {
+        postForm.addEventListener("submit", function(event) {
+            event.preventDefault(); // Запобігаємо перезавантаженню сторінки
+            const formData = new FormData(this); // Отримуємо всі дані форми
 
-        fetch("post-page.php", {
-            method: "POST",
-            body: formData
-        })
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById("post-result").innerHTML = data;
-        })
-        .catch(error => {
-            alert("Error: " + error.message);
+            console.log("Sending POST request with data:", Object.fromEntries(formData)); // Логування
+
+            fetch("post-page.php", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                const currentTime = getCurrentTime(); // Час виконання
+                console.log("POST response received at:", currentTime);
+
+                document.getElementById("post-result").innerHTML = `
+                    ${data}<br>
+                    <small>Executed at: ${currentTime}</small>
+                `;
+            })
+            .catch(error => {
+                console.error("POST request failed:", error);
+                alert("Error: " + error.message);
+            });
         });
-    });
+    }
 });
