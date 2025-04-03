@@ -40,7 +40,7 @@ jobs:
         
   deploy:
     needs: build-and-test
-    if: github.ref == 'refs/heads/feature/develop/task2'
+    if: github.ref == 'refs/heads/feature/develop/task3'
     runs-on: ubuntu-latest
     
     steps:
