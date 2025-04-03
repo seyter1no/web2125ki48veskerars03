@@ -1,32 +1,32 @@
 <?php
-
+// Параметри підключення до бази даних
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "web2425";
 
-
+// Підключення до MySQL
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-
+// Перевірка підключення
 if ($conn->connect_error) {
     die("Помилка підключення: " . $conn->connect_error);
 }
 
-
+// Повідомлення для користувача
 $message = "";
 
-
+// Якщо форма відправлена методом POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $login = trim($_POST['login']);
     $password = trim($_POST['password']);
 
-
+    // Перевіряємо, чи заповнені поля
     if (empty($login) || empty($password)) {
         $message = "Будь ласка, заповніть всі поля!";
     } else {
-
-        $check_sql = "SELECT * FROM login_password WHERE login = ?";
+        // Перевіряємо, чи користувач вже існує
+        $check_sql = "SELECT * FROM login_password WHERE Login = ?";
         $check_stmt = $conn->prepare($check_sql);
         $check_stmt->bind_param("s", $login);
         $check_stmt->execute();
@@ -35,30 +35,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($result->num_rows > 0) {
             $message = "Цей логін вже зайнятий!";
         } else {
-
-            $open_password = $password;
-
+            // Хешування пароля
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-            $encryption_key = "your_encryption_key";
-            $iv = substr(hash('sha256', "your_iv"), 0, 16);
-            $encrypted_password = openssl_encrypt($password, "aes-256-cbc", $encryption_key, 0, $iv);
-
-            $sql = "INSERT INTO login_password (login, password, openssl_encrypt, password_hash) VALUES (?, ?, ?, ?)";
+            // SQL-запит для додавання користувача
+            $sql = "INSERT INTO login_password (Login, Password) VALUES (?, ?)";
             $stmt = $conn->prepare($sql);
 
             if (!$stmt) {
                 die("SQL Error: " . $conn->error);
             }
 
-            $stmt->bind_param("ssss", $login, $open_password, $encrypted_password, $hashed_password);
+            $stmt->bind_param("ss", $login, $hashed_password);
 
             if ($stmt->execute()) {
-
+                // Створюємо сесію для користувача після успішної реєстрації
                 session_start();
                 $_SESSION['login'] = $login;
 
-                header("Location: home.php");
+                // Перенаправляємо на головну сторінку
+                header("Location: index.php");
                 exit();
             } else {
                 $message = "Помилка: " . $conn->error;
@@ -71,6 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
+// Закриваємо з'єднання
 $conn->close();
 ?>
 
@@ -82,10 +79,8 @@ $conn->close();
     <title>Реєстрація</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -93,55 +88,37 @@ $conn->close();
         }
         .container {
             background: white;
-            padding: 40px;
-            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
-            border-radius: 15px;
-            width: 320px;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            width: 300px;
             text-align: center;
-        }
-        h2 {
-            color: #333;
-            margin-bottom: 20px;
         }
         input {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 25px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-        input:focus {
-            outline: none;
-            border-color: #d9534f;
+            padding: 10px;
+            margin: 5px 0;
         }
         button {
             width: 100%;
-            padding: 12px;
-            background-color: #d9534f;
+            padding: 10px;
+            background: blue;
             color: white;
             border: none;
-            border-radius: 25px;
             cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #c9302c;
         }
         .message {
-            margin-top: 15px;
-            color: #f2a6a6;
+            margin-top: 10px;
+            color: red;
         }
         .link {
-            margin-top: 20px;
+            margin-top: 10px;
             display: block;
             text-decoration: none;
-            color: #d9534f;
-            font-size: 14px;
+            color: blue;
         }
-        .link:hover {
-            text-decoration: underline;
+        .buttons {
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -155,9 +132,10 @@ $conn->close();
         <button type="submit">Зареєструватися</button>
     </form>
     <div class="message"><?php echo $message; ?></div>
-
-    <div>
-        <a href="login.php" class="link">Увійти</a>
+    
+    <div class="buttons">
+        <!-- Кнопка для переходу на сторінку входу -->
+        <a href="login.php"><button type="button">Увійти</button></a>
     </div>
 </div>
 
