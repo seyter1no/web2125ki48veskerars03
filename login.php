@@ -20,14 +20,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($login) || empty($password)) {
         $message = "Будь ласка, заповніть всі поля!";
     } else {
-
-        $sql = "SELECT `Password` FROM `login_password` WHERE `Login` = ?";
+        $sql = "SELECT `password_hash` FROM `login_password` WHERE `Login` = ?";
         $stmt = $conn->prepare($sql);
+        if ($stmt === false) {
+            die('Помилка підготовки запиту: ' . $conn->error);
+        }
+
         $stmt->bind_param("s", $login);
         $stmt->execute();
         $stmt->store_result();
-        
-        if ($stmt->num_rows > 0) {
+
+        if ($stmt->num_rows === 1) {
             $stmt->bind_result($hashed_password);
             $stmt->fetch();
 
@@ -133,7 +136,7 @@ $conn->close();
     <div class="message"><?php echo $message; ?></div>
 
     <div>
-        <a href="register.php" class="link">Зареєструватися</a>
+        <a href="index.php" class="link">Зареєструватися</a>
     </div>
 </div>
 

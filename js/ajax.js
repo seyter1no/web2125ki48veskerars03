@@ -34,15 +34,13 @@ if (getForm) {
     });
 }
 
-
-    // ------------------- POST-запит -------------------
     const postForm = document.getElementById("post-form");
     if (postForm) {
         postForm.addEventListener("submit", function(event) {
-            event.preventDefault(); // Запобігаємо перезавантаженню сторінки
-            const formData = new FormData(this); // Отримуємо всі дані форми
+            event.preventDefault();
+            const formData = new FormData(this);
 
-            console.log("Sending POST request with data:", Object.fromEntries(formData)); // Логування
+            console.log("Sending POST request with data:", Object.fromEntries(formData));
 
             fetch("post-page.php", {
                 method: "POST",
@@ -50,7 +48,7 @@ if (getForm) {
             })
             .then(response => response.text())
             .then(data => {
-                const currentTime = getCurrentTime(); // Час виконання
+                const currentTime = getCurrentTime();
                 console.log("POST response received at:", currentTime);
 
                 document.getElementById("post-result").innerHTML = `
