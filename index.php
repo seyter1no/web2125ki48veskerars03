@@ -4,8 +4,8 @@ require_once 'vendor/autoload.php';
 session_start();
 
 $google_client = new Google_Client();
-$google_client->setClientId('341535977204-6vsum5n0rtv1rcdq545da5og7cd5cu46.apps.googleusercontent.com');
-$google_client->setClientSecret('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');
+$google_client->setClientId('');
+$google_client->setClientSecret('');
 $google_client->setRedirectUri('http://localhost/web2125ki48veskerars03/googlelogin.php');
 $google_client->addScope('email');
 $google_client->addScope('profile');
@@ -71,8 +71,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $userPhone = $_POST['phone'] ?? '';
                 $userPhone = preg_replace('/\D/', '', $userPhone); // очищення від нецифрових символів
             
-                $token = 'EAAULFJ1GBDsBO0aPGQaTHUajp24ZBGimmSPrljh4jM6uqpHUpY5ZAJHBN8VdgscDMG5VdxxzJ1QREEHRXdrhy9qkfzclPGzXtChNCQL5PrqthwTycwkNEVOsSLYgkst2gQqq0wxwpZC6HB8CbYoYjQG8GkKsZBiFbjDMxbtQsMfqKmZBsB4poCyOFz9lnKJt37siBh9V1zxqRz9o3ez0WpMtrkTMZD';
-                $phone_number_id = '550546854818368';
+                $token = '';
+                $phone_number_id = '';
                 $template_name = 'confirmation';
                 $language_code = 'en';
             
