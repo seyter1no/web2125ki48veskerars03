@@ -4,8 +4,8 @@ require_once 'vendor/autoload.php';
 session_start();
 
 $google_client = new Google_Client();
-$google_client->setClientId('');
-$google_client->setClientSecret('');
+//$google_client->setClientId('');
+//$google_client->setClientSecret('');
 $google_client->setRedirectUri('http://localhost/web2125ki48veskerars03/googlelogin.php');
 $google_client->addScope('email');
 $google_client->addScope('profile');
