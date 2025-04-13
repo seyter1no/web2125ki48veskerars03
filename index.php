@@ -1,5 +1,18 @@
 <?php
 
+require_once 'vendor/autoload.php';
+session_start();
+
+$google_client = new Google_Client();
+$google_client->setClientId('341535977204-6vsum5n0rtv1rcdq545da5og7cd5cu46.apps.googleusercontent.com');
+$google_client->setClientSecret('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');
+$google_client->setRedirectUri('http://localhost/web2125ki48veskerars03/googlelogin.php');
+$google_client->addScope('email');
+$google_client->addScope('profile');
+
+// Створюємо URL для Google Login
+$google_login_url = $google_client->createAuthUrl();
+
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -23,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
     if (empty($login) || empty($password)) {
-        $message = "Будь ласка, заповніть всі поля!";
+        $message = "Please fill in all fields!";
     } else {
 
         $check_sql = "SELECT * FROM login_password WHERE login = ?";
@@ -33,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = $check_stmt->get_result();
 
         if ($result->num_rows > 0) {
-            $message = "Цей логін вже зайнятий!";
+            $message = "This login is already taken!";
         } else {
 
             $open_password = $password;
@@ -54,14 +67,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bind_param("ssss", $login, $open_password, $encrypted_password, $hashed_password);
 
             if ($stmt->execute()) {
-
+                // Надсилання повідомлення через WhatsApp
+                $userPhone = $_POST['phone'] ?? '';
+                $userPhone = preg_replace('/\D/', '', $userPhone); // очищення від нецифрових символів
+            
+                $token = 'EAAULFJ1GBDsBO0aPGQaTHUajp24ZBGimmSPrljh4jM6uqpHUpY5ZAJHBN8VdgscDMG5VdxxzJ1QREEHRXdrhy9qkfzclPGzXtChNCQL5PrqthwTycwkNEVOsSLYgkst2gQqq0wxwpZC6HB8CbYoYjQG8GkKsZBiFbjDMxbtQsMfqKmZBsB4poCyOFz9lnKJt37siBh9V1zxqRz9o3ez0WpMtrkTMZD';
+                $phone_number_id = '550546854818368';
+                $template_name = 'confirmation';
+                $language_code = 'en';
+            
+                $url = "https://graph.facebook.com/v19.0/{$phone_number_id}/messages";
+            
+                $data = [
+                    'messaging_product' => 'whatsapp',
+                    'to' => $userPhone,
+                    'type' => 'template',
+                    'template' => [
+                        'name' => $template_name,
+                        'language' => ['code' => $language_code]
+                    ]
+                ];
+            
+                $options = [
+                    'http' => [
+                        'header'  => "Authorization: Bearer $token\r\n" .
+                                     "Content-Type: application/json\r\n",
+                        'method'  => 'POST',
+                        'content' => json_encode($data),
+                        'ignore_errors' => true
+                    ]
+                ];
+            
+                $context  = stream_context_create($options);
+                $result = file_get_contents($url, false, $context);
+            
+                // Лог повідомлення (опційно, можеш видалити)
+                if ($result === FALSE) {
+                    $error = error_get_last();
+                    error_log("Помилка WhatsApp API: " . print_r($error, true));
+                } else {
+                    error_log("Відповідь WhatsApp API: " . $result);
+                }
+            
                 session_start();
                 $_SESSION['login'] = $login;
-
+            
                 header("Location: home.php");
                 exit();
             } else {
-                $message = "Помилка: " . $conn->error;
+                $message = "Error: " . $conn->error;
             }
 
             $stmt->close();
@@ -69,6 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $check_stmt->close();
     }
+    
 }
 
 $conn->close();
@@ -93,11 +148,15 @@ $conn->close();
         }
         .container {
             background: white;
-            padding: 40px;
+            padding: 30px;
             box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
             border-radius: 15px;
             width: 320px;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 400px; 
         }
         h2 {
             color: #333;
@@ -106,7 +165,7 @@ $conn->close();
         input {
             width: 100%;
             padding: 12px;
-            margin: 10px 0;
+            margin: 8px 0;
             border: 1px solid #ccc;
             border-radius: 25px;
             font-size: 14px;
@@ -125,6 +184,7 @@ $conn->close();
             border-radius: 25px;
             cursor: pointer;
             font-size: 16px;
+            margin-top: 15px;
         }
         button:hover {
             background-color: #c9302c;
@@ -143,6 +203,15 @@ $conn->close();
         .link:hover {
             text-decoration: underline;
         }
+        .google-signin {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            align-self: center; 
+        }
+        .google-signin img {
+            width: 100%;
+            max-width: 250px; 
+        }
     </style>
 </head>
 <body>
@@ -152,13 +221,18 @@ $conn->close();
     <form method="POST">
         <input type="text" name="login" placeholder="Введіть логін" required><br>
         <input type="password" name="password" placeholder="Введіть пароль" required><br>
+        <label for="phone">Введіть номер телефону:</label><br>
+        <input type="text" id="phone" name="phone" placeholder="380XXXXXXXXX" required><br><br>
         <button type="submit">Зареєструватися</button>
     </form>
-    <div class="message"><?php echo $message; ?></div>
-
     <div>
         <a href="login.php" class="link">Увійти</a>
     </div>
+ <div class="google-signin">
+    <a href="<?php echo $google_login_url; ?>" class="link">
+        <img src="https://developers.google.com/identity/images/btn_google_signin_dark_normal_web.png" alt="Google Sign-In Button">
+    </a>
+</div>
 </div>
 
 </body>
