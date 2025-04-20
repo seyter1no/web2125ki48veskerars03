@@ -81,5 +81,5 @@ Once deployed, click "View App" to access your website.
 
 # Link to my site
 
-### [Click Me )](darkgray-fly-536184.hostingersite.com)
+### [Click Me](http://darkgray-fly-536184.hostingersite.com)
 
