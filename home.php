@@ -1,13 +1,3 @@
-<?php
-
-session_start();
-
-if (!isset($_SESSION['login'])) {
-    header("Location: index.php");
-    exit();
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,6 +16,12 @@ if (!isset($_SESSION['login'])) {
                 <li><a href="post-page.php">POST Page</a></li>
             </ul>
         </nav>
+        <div class="logout-container">
+    <!-- Форма для виходу -->
+    <form action="logout.php" method="POST">
+        <button class="logout-button" type="submit" title="Вийти">Exit</button>
+    </form>
+        </div>
     </header>
 
     <main>
