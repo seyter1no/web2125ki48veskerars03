@@ -5,69 +5,48 @@ $username = "root";
 $password = "";
 $dbname = "web2425";
 
-
 $conn = new mysqli($servername, $username, $password, $dbname);
-
 
 if ($conn->connect_error) {
     die("Помилка підключення: " . $conn->connect_error);
 }
 
-
 $message = "";
-
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $login = trim($_POST['login']);
     $password = trim($_POST['password']);
 
-
     if (empty($login) || empty($password)) {
         $message = "Будь ласка, заповніть всі поля!";
     } else {
-
-        $check_sql = "SELECT * FROM login_password WHERE login = ?";
-        $check_stmt = $conn->prepare($check_sql);
-        $check_stmt->bind_param("s", $login);
-        $check_stmt->execute();
-        $result = $check_stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            $message = "Цей логін вже зайнятий!";
-        } else {
-
-            $open_password = $password;
-
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-            $encryption_key = "your_encryption_key";
-            $iv = substr(hash('sha256', "your_iv"), 0, 16);
-            $encrypted_password = openssl_encrypt($password, "aes-256-cbc", $encryption_key, 0, $iv);
-
-            $sql = "INSERT INTO login_password (login, password, openssl_encrypt, password_hash) VALUES (?, ?, ?, ?)";
-            $stmt = $conn->prepare($sql);
-
-            if (!$stmt) {
-                die("SQL Error: " . $conn->error);
-            }
-
-            $stmt->bind_param("ssss", $login, $open_password, $encrypted_password, $hashed_password);
-
-            if ($stmt->execute()) {
-
-                session_start();
-                $_SESSION['login'] = $login;
-
-                header("Location: home.php");
-                exit();
-            } else {
-                $message = "Помилка: " . $conn->error;
-            }
-
-            $stmt->close();
+        $sql = "SELECT `password_hash` FROM `login_password` WHERE `Login` = ?";
+        $stmt = $conn->prepare($sql);
+        if ($stmt === false) {
+            die('Помилка підготовки запиту: ' . $conn->error);
         }
 
-        $check_stmt->close();
+        $stmt->bind_param("s", $login);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows === 1) {
+            $stmt->bind_result($hashed_password);
+            $stmt->fetch();
+
+            if (password_verify($password, $hashed_password)) {
+                session_start();
+                $_SESSION['login'] = $login;
+                header("Location: home.php");
+                exit;
+            } else {
+                $message = "Невірний пароль!";
+            }
+        } else {
+            $message = "Користувач не знайдений!";
+        }
+
+        $stmt->close();
     }
 }
 
@@ -79,7 +58,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Реєстрація</title>
+    <title>Вхід</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -148,16 +127,16 @@ $conn->close();
 <body>
 
 <div class="container">
-    <h2>Реєстрація</h2>
+    <h2>Вхід</h2>
     <form method="POST">
         <input type="text" name="login" placeholder="Введіть логін" required><br>
         <input type="password" name="password" placeholder="Введіть пароль" required><br>
-        <button type="submit">Зареєструватися</button>
+        <button type="submit">Увійти</button>
     </form>
     <div class="message"><?php echo $message; ?></div>
 
     <div>
-        <a href="login.php" class="link">Увійти</a>
+        <a href="index.php" class="link">Зареєструватися</a>
     </div>
 </div>
 

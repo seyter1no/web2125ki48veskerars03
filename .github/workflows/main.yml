@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - '**'  # Це означає, що тригер працює для всіх гілок
+      - '**' #for all branches
   pull_request:
 
 jobs:
