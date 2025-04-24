@@ -1,4 +1,24 @@
 <?php
+
+// --- Anti-phishing domain check ---
+$allowedHosts = ['localhost', '127.0.0.1', 'yourdomain.com'];
+
+$currentHost = $_SERVER['HTTP_HOST'];
+
+if (!in_array($currentHost, $allowedHosts)) {
+    error_log("[" . date("Y-m-d H:i:s") . "] ⚠ Підозрілий хост: $currentHost | IP: " . ($_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN') . "\n", 3, __DIR__ . '/phishing_log.txt');
+    
+    echo '<h1 style="color:red;">⚠ Попередження: Ви перебуваєте на підозрілому сайті!</h1>';
+    echo '<p>Можлива фішингова атака. Закрийте сторінку та відвідайте офіційний сайт.</p>';
+    exit;
+}
+
+// --- HTTP Security Headers ---
+header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://developers.google.com 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https://developers.google.com;");
+header("X-Frame-Options: DENY");
+header("X-Content-Type-Options: nosniff");
+header("Referrer-Policy: no-referrer");
+
 require_once 'vendor/autoload.php';
 
 session_start();
